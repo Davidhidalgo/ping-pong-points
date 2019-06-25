@@ -37,7 +37,7 @@ void setup()
 
 void toggleServe()
 {
-    const bool changeServe = (player1 + player2) % 3 == 0;
+    const bool changeServe = (player1 + player2) % 2 == 0;
     if (changeServe)
     {
         if (playerServing == 1)
