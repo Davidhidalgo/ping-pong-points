@@ -1,124 +1,102 @@
 #include "SevSeg.h"
+#include <AceButton.h>
+using namespace ace_button;
+
 SevSeg sevseg;
 
-const int button1Pin = 10;
-const int button2Pin = 11;
-int button1State = 0;
-int button2State = 0;
+const int BUTTON1_PIN = 10;
+const int BUTTON1_PIN = 12;
+AceButton buttonPlayer1;
+AceButton buttonPlayer2;
+
+void handleEvent(AceButton*, uint8_t, uint8_t);
 
 char DASHES[2] = {'-', '-'};
 
-unsigned long previousMillis = 0;
-const long interval = 1000;
-
 const int matchPoints = 9;
 bool matchStarted = false;
-int player1 = 0;
-int player2 = 0;
+int player1Score = 0;
+int player2Score = 0;
 int playerServing = -1;
 
-void setup()
-{
+ void setup()
+ {
     byte numDigits = 2;
     byte digitPins[] = {12, 13};
     byte segmentPins[] = {6, 5, 2, 3, 4, 7, 8, 9};
     bool resistorsOnSegments = true;
-    bool updateWithDelays = false; // Default 'false' is Recommended
-    bool leadingZeros = true;      // Use 'true' if you'd like to keep the leading zeros
-
+    bool updateWithDelays = false; 
+    bool leadingZeros = true;
     byte hardwareConfig = COMMON_ANODE;
     sevseg.begin(hardwareConfig, numDigits, digitPins, segmentPins, resistorsOnSegments, updateWithDelays, leadingZeros);
     sevseg.setBrightness(200);
-    // initialize the pushbutton pin as an input:
-    pinMode(button1Pin, INPUT);
-    pinMode(button2Pin, INPUT);
+    
+    pinMode(BUTTON_PIN, INPUT_PULLUP);
+    //pinMode(button2Pin, INPUT_PULLUP);
+
+    buttonPlayer1.init()
+    buttonPlayer1.setEventHandler(handleEvent);
+
     Serial.begin(9600);
 }
 
-void toggleServe()
+ void toggleServe()
+ {
+     bool changeServe = (player1Score + player2Score) % 2 == 0;
+     if (changeServe)
+     {
+         if (playerServing == 1)
+         {
+             playerServing = 0;
+         }
+         else
+         {
+             playerServing = 1;
+         }
+     }
+ }
+
+ void resetMatch()
+ {
+     player1Score = 0;
+     player2Score = 0;
+     matchStarted = false;
+ }
+
+ void displayScore()
+ {
+     String result = String(player1Score); // + String(player2Score);
+     
+     if (!matchStarted) {
+         displayDashes();
+     } else {
+        sevseg.setNumber(result.toInt());//, playerServing);
+     }
+     sevseg.refreshDisplay();   
+ }
+
+ void displayDashes()
+ {
+     sevseg.setChars(DASHES);
+ }
+
+void loop() 
 {
-    const bool changeServe = (player1 + player2) % 2 == 0;
-    if (changeServe)
-    {
-        if (playerServing == 1)
-        {
-            playerServing = 0;
-        }
-        else
-        {
-            playerServing = 1;
-        }
-    }
+    buttonPlayer1.check();
+    buttonPlayer2.check();
+
+    displayScore();
 }
 
-void resetMatch()
-{
-    player1 = 0;
-    player2 = 0;
-    matchStarted = false;
-}
-
-void displayScore()
-{
-    String result = String(player1) + String(player2);
-    sevseg.setNumber(result.toInt(), playerServing);
-    sevseg.refreshDisplay();
-}
-
-void displayDashes()
-{
-    sevseg.setChars(DASHES);
-    sevseg.refreshDisplay();
-}
-
-void loop()
-{
-    const int button1NewState = digitalRead(button1Pin);
-    const int button2NewState = digitalRead(button2Pin);
-    const bool button1Up = button1State == 1 && button1NewState == 0;
-    const bool button2Up = button2State == 1 && button2NewState == 0;
-    const bool somePlayerButtonUp = button1Up || button2Up;
-    button1State = button1NewState;
-    button2State = button2NewState;
-    bool wonMatch = player1 == matchPoints || player2 == matchPoints;
-    bool resetingMatch = (player1 > matchPoints || player2 > matchPoints) || (wonMatch && somePlayerButtonUp);
-
-    if (resetingMatch)
-    {
-        resetMatch();
-    }
-    else
-    {
-        if (matchStarted)
-        {
-            if (button1Up)
-            {
-                player1 += 1;
-                toggleServe();
-            }
-            if (button2Up)
-            {
-                player2 += 1;
-                toggleServe();
-            }
-
-            displayScore();
-        }
-        else
-        {
-            displayDashes();
-            if (somePlayerButtonUp)
-            {
-                matchStarted = true;
-                if (button1Up)
-                {
-                    playerServing = 1;
-                }
-                if (button2Up)
-                {
-                    playerServing = 0;
-                }
-            }
-        }
-    }
+void handleEvent(AceButton* /* button */, uint8_t eventType,
+    uint8_t /* buttonState */) {
+  switch (eventType) {
+    case AceButton::kEventReleased:
+      if (!matchStarted) {
+          matchStarted = true;
+      } else {
+        player1Score += 1;
+      }
+      break;
+  }
 }
