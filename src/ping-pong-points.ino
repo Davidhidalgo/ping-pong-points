@@ -12,6 +12,7 @@
 #include <Fonts/FreeSansBold24pt7b.h>
 
 #include <AceButton.h>
+using namespace ace_button;
 
 const char *name = "FreeSansBold18pt7b";
 const GFXfont *fontResult = &FreeSansBold18pt7b;
@@ -19,12 +20,10 @@ const GFXfont *fontResult = &FreeSansBold18pt7b;
 GxIO_Class io(SPI, SS, 22, 21);
 GxEPD_Class display(io, 16, 4);
 
-using namespace ace_button;
+const uint8_t BUTTON1_PIN = 12;
+const uint8_t BUTTON2_PIN = 12;
 
-const int BUTTON1_PIN = 10;
-const int BUTTON2_PIN = 12;
-AceButton buttonPlayer1;
-AceButton buttonPlayer2;
+AceButton buttonPlayer1(BUTTON1_PIN);
 
 void handleEvent(AceButton *, uint8_t, uint8_t);
 
@@ -40,32 +39,32 @@ int playerServing = -1;
 void setup()
 {
     Serial.begin(9600);
-    display.init();
+    // display.init();
 
-    //display.drawExampleBitmap(gImage_splash, 0, 0, 200, 200, GxEPD_BLACK);
-    display.fillScreen(GxEPD_WHITE);
-    display.update();
+    // //display.drawExampleBitmap(gImage_splash, 0, 0, 200, 200, GxEPD_BLACK);
+    // display.fillScreen(GxEPD_WHITE);
+    // display.update();
 
-    String texto = "10";
+    // String texto = "10";
 
-    display.setRotation(90);
+    // display.setRotation(90);
 
-    printGrid();
-    display.update();
-    setResultFont();
-
-    display.drawExampleBitmap(gImage_gui_f, sizeof(gImage_gui_f), GxEPD::bm_default | GxEPD::bm_partial_update);
-
-    // display.drawExampleBitmap(gImage_gui_f, 0, 0, 200, 200, GxEPD_BLACK);
-    delay(2000);
+    // printGrid();
+    // display.update();
+    // setResultFont();
 
     // display.drawExampleBitmap(gImage_gui_f, sizeof(gImage_gui_f), GxEPD::bm_default | GxEPD::bm_partial_update);
 
-    //pinMode(BUTTON_PIN, INPUT_PULLUP);
-    //pinMode(button2Pin, INPUT_PULLUP);
+    // // display.drawExampleBitmap(gImage_gui_f, 0, 0, 200, 200, GxEPD_BLACK);
+    // // delay(2000);
 
-    // buttonPlayer1.init()
-    //     buttonPlayer1.setEventHandler(handleEvent);
+    // display.drawExampleBitmap(gImage_gui_f, sizeof(gImage_gui_f), GxEPD::bm_default | GxEPD::bm_partial_update);
+    pinMode(BUTTON1_PIN, INPUT);
+    buttonPlayer1.init(BUTTON1_PIN);
+
+    pinMode(LED_BUILTIN, OUTPUT);
+
+    buttonPlayer1.setEventHandler(handleEvent);
 }
 
 void loop()
@@ -74,10 +73,28 @@ void loop()
     // buttonPlayer2.check();
 
     // displayScore();
-    printPlayer1();
-    delay(500);
-    printPlayer2();
-    delay(2000);
+    // printPlayer1();
+    // delay(500);
+    // printPlayer2();
+    // delay(2000);
+    buttonPlayer1.check();
+    // Serial.println("  PACHA   ");
+}
+
+void handleEvent(AceButton * /* button */, uint8_t eventType,
+                 uint8_t /* buttonState */)
+{
+    switch (eventType)
+    {
+    case AceButton::kEventPressed:
+        Serial.println("Pressed!");
+        digitalWrite(LED_BUILTIN, HIGH);
+        break;
+    case AceButton::kEventReleased:
+        Serial.println("Released!");
+        digitalWrite(LED_BUILTIN, LOW);
+        break;
+    }
 }
 
 void setResultFont()
@@ -177,22 +194,4 @@ void displayScore()
 void displayDashes()
 {
     // sevseg.setChars(DASHES);
-}
-
-void handleEvent(AceButton * /* button */, uint8_t eventType,
-                 uint8_t /* buttonState */)
-{
-    switch (eventType)
-    {
-    case AceButton::kEventReleased:
-        if (!matchStarted)
-        {
-            matchStarted = true;
-        }
-        else
-        {
-            player1Score += 1;
-        }
-        break;
-    }
 }
