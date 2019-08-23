@@ -19,7 +19,6 @@
 //     G18          CLK
 //     G23          DIN
 //     GND          GND
-//     3V3          VCC
 
 
 #include <Arduino.h>
