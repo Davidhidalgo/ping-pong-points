@@ -1,3 +1,27 @@
+// Connection diagram
+//
+// # Button
+//
+//    ESP32  -->   BUTTON   
+//    5V           Pin #1 
+//    G15          Pin #2
+//    
+//    Note: There is no need to use a resistance nor GND connecion, since ESP32 already has it.
+//
+// # e-Paper modele 
+//
+//
+//     ESP32  -->   ePaper
+//     G4           BUSY
+//     G21          RST
+//     G22          DC
+//     G5           CS
+//     G18          CLK
+//     G23          DIN
+//     GND          GND
+//     3V3          VCC
+
+
 #include <Arduino.h>
 #include <GxEPD.h>
 #include <GxGDEP015OC1/GxGDEP015OC1.cpp>
