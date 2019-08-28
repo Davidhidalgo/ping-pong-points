@@ -81,7 +81,7 @@ void setup()
     //display.drawExampleBitmap(gImage_gui_f, 0, 0, 200, 200, GxEPD_BLACK);
     // display.drawExampleBitmap(gImage_gui_f, sizeof(gImage_gui_f), GxEPD::bm_default | GxEPD::bm_partial_update);
 
-    pinMode(BUTTON1_PIN, INPUT_PULLDOWN);
+    pinMode(BUTTON1_PIN, INPUT_PULLUP);
     //pinMode(button2Pin, INPUT_PULLUP);
 
     // buttonPlayer1.init()
@@ -103,12 +103,11 @@ void loop()
     
     if ( buttonState == HIGH ) { 
         printPlayer1();
-        //delay(500);
         Serial.println("H");
     } else {
         Serial.println("L");
-        //delay(500);
     }
+    delay(200);
 
     //Serial.println("loop");
 }
