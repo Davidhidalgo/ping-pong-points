@@ -46,7 +46,7 @@ using namespace ace_button;
 
 const int BUTTON1_PIN = 15;
 const int BUTTON2_PIN = 12;
-AceButton buttonPlayer1;
+AceButton button(BUTTON1_PIN);
 AceButton buttonPlayer2;
 
 void handleEvent(AceButton *, uint8_t, uint8_t);
@@ -81,16 +81,15 @@ void setup()
     //display.drawExampleBitmap(gImage_gui_f, 0, 0, 200, 200, GxEPD_BLACK);
     // display.drawExampleBitmap(gImage_gui_f, sizeof(gImage_gui_f), GxEPD::bm_default | GxEPD::bm_partial_update);
 
-    pinMode(BUTTON1_PIN, INPUT_PULLUP);
+    pinMode(BUTTON1_PIN, INPUT_PULLDOWN);
     //pinMode(button2Pin, INPUT_PULLUP);
 
-    // buttonPlayer1.init()
-    //     buttonPlayer1.setEventHandler(handleEvent);
+    button.setEventHandler(handleEvent);
 }
 
 void loop()
 {
-    // buttonPlayer1.check();
+    button.check();
     // buttonPlayer2.check();
 
     // displayScore();
@@ -98,7 +97,8 @@ void loop()
     //delay(500);
     //printPlayer2();
     //delay(2000);
-    
+
+ /*   
     int buttonState = digitalRead(BUTTON1_PIN);
     
     if ( buttonState == HIGH ) { 
@@ -108,8 +108,7 @@ void loop()
         Serial.println("L");
     }
     delay(200);
-
-    //Serial.println("loop");
+*/
 }
 
 
@@ -215,17 +214,13 @@ void displayDashes()
 void handleEvent(AceButton * /* button */, uint8_t eventType,
                  uint8_t /* buttonState */)
 {
+    Serial.println("EV TYP");
+    Serial.println(eventType);
     switch (eventType)
     {
     case AceButton::kEventReleased:
-        if (!matchStarted)
-        {
-            matchStarted = true;
-        }
-        else
-        {
-            player1Score += 1;
-        }
-        break;
+        printPlayer1();
+        Serial.println("RELEASED");
+       break;
     }
 }
