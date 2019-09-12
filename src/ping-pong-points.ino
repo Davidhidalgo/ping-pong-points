@@ -45,9 +45,9 @@ GxEPD_Class display(io, 16, 4);
 using namespace ace_button;
 
 const int BUTTON1_PIN = 15;
-const int BUTTON2_PIN = 12;
-AceButton button(BUTTON1_PIN);
-AceButton buttonPlayer2;
+const int BUTTON2_PIN = 2;
+AceButton buttonPlayer1(BUTTON1_PIN);
+AceButton buttonPlayer2(BUTTON2_PIN);
 
 void handleEvent(AceButton *, uint8_t, uint8_t);
 
@@ -68,7 +68,6 @@ void setup()
     display.drawExampleBitmap(gImage_splash, 0, 0, 200, 200, GxEPD_BLACK);
     display.fillScreen(GxEPD_WHITE);
     display.update();
-
     
     display.setRotation(90);
 
@@ -82,15 +81,16 @@ void setup()
     // display.drawExampleBitmap(gImage_gui_f, sizeof(gImage_gui_f), GxEPD::bm_default | GxEPD::bm_partial_update);
 
     pinMode(BUTTON1_PIN, INPUT_PULLDOWN);
-    //pinMode(button2Pin, INPUT_PULLUP);
+    pinMode(BUTTON2_PIN, INPUT_PULLDOWN);
 
-    button.setEventHandler(handleEvent);
+    buttonPlayer1.setEventHandler(handleEvent);
+    buttonPlayer2.setEventHandler(handleEvent);
 }
 
 void loop()
 {
-    button.check();
-    // buttonPlayer2.check();
+    buttonPlayer1.check();
+    buttonPlayer2.check();
 
     // displayScore();
     //printPlayer1();
