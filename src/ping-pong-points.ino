@@ -47,10 +47,8 @@ GxEPD_Class display(io, 16, 4);
 
 using namespace ace_button;
 
-const int BUTTON1_PIN = 15;
-const int BUTTON2_PIN = 2;
-AceButton buttonPlayer1(BUTTON1_PIN);
-AceButton buttonPlayer2(BUTTON2_PIN);
+//const int BUTTON1_PIN = 15;
+//const int BUTTON2_PIN = 2;
 
 void handleEvent(AceButton *, uint8_t, uint8_t);
 
@@ -63,23 +61,38 @@ int player1Score = 0;
 int player2Score = 0;
 int playerServing = -1;
 
+const uint8_t NUM_PLAYERS = 2;
+
+struct Player {
+    const uint8_t buttonPin;
+    const uint8_t score;
+};
+
+Player PLAYERS[NUM_PLAYERS] = {
+    {15, 0},
+    {2, 0}
+};
+
+AceButton buttons[NUM_PLAYERS];
+
 void setup()
 {
     Serial.begin(115200);
     
     setupDisplay();
 
-    pinMode(BUTTON1_PIN, INPUT_PULLDOWN);
-    pinMode(BUTTON2_PIN, INPUT_PULLDOWN);
-
-    buttonPlayer1.setEventHandler(handleEvent);
-    buttonPlayer2.setEventHandler(handleEvent);
+    for (uint8_t i=0; i < NUM_PLAYERS; i++) {
+        pinMode(PLAYERS[i].buttonPin, INPUT_PULLDOWN);
+        buttons[i].init(PLAYERS[i].buttonPin, HIGH, i);
+        buttons[i].setEventHandler(handleEvent);
+    }
 }
 
 void loop()
-{
-    buttonPlayer1.check();
-    buttonPlayer2.check();
+{ 
+    for (uint8_t i=0; i < NUM_PLAYERS; i ++) {
+        buttons[i].check();
+    }
 }
 
 void setupDisplay() {
@@ -121,7 +134,18 @@ void printPlayer1()
     display.setCursor(box_x + xPosition, 72);
     display.print(player1Score);
     display.updateWindow(box_x, box_y, box_w, box_h, true);
-    player1Score += 1;
+    
+    if (player1Score >= 11) {
+        //display.fillRect(box_x, box_y, box_w, box_h, GxEPD_WHITE);
+        //display.drawRect(box_x, box_y, box_w, box_h, GxEPD_BLACK);
+        display.fillScreen(GxEPD_WHITE);
+        display.update();
+        display.setCursor(box_x + xPosition, 72);
+        display.setTextSize(0.25);       
+        display.print("todo el rato trap");
+        display.update();
+
+       }
 }
 
 void printPlayer2()
@@ -142,7 +166,6 @@ void printPlayer2()
     display.setCursor(box_x + xPosition, 72);
     display.print(player2Score);
     display.updateWindow(box_x, box_y, box_w, box_h, true);
-    player2Score += 1;
 }
 
 void printGrid()
@@ -195,13 +218,21 @@ void displayDashes()
     // sevseg.setChars(DASHES);
 }
 
-void handleEvent(AceButton * /* button */, uint8_t eventType,
-                 uint8_t /* buttonState */)
+void handleEvent(AceButton * button, uint8_t eventType, uint8_t buttonState)
 {
+    uint8_t id = button->getId(); 
+
     switch (eventType)
     {
     case AceButton::kEventReleased:
-        printPlayer1();
-       break;
+        Serial.println(id);
+        if (id==0) {
+            player1Score += 1;
+            printPlayer1();
+        } else if (id==1) {
+            player2Score += 1;
+            printPlayer2();
+        }
+        break;
     }
 }
