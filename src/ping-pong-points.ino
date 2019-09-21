@@ -2,10 +2,14 @@
 //
 // # Button
 //
-//    ESP32  -->   BUTTON   
+//    ESP32  -->   BUTTON #1   
 //    5V           Pin #1 
 //    G15          Pin #2
 //    
+//    ESP32  -->   BUTTON #2   
+//    5V           Pin #1 
+//    G2          Pin #2
+//
 //    Note: There is no need to use a resistance nor GND connecion, since ESP32 already has it.
 //
 // # e-Paper modele 
