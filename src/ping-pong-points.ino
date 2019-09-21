@@ -8,7 +8,7 @@
 //    
 //    ESP32  -->   BUTTON #2   
 //    5V           Pin #1 
-//    G2          Pin #2
+//    G2           Pin #2
 //
 //    Note: There is no need to use a resistance nor GND connecion, since ESP32 already has it.
 //
@@ -32,7 +32,6 @@
 #include <GxIO/GxIO.cpp>
 #include "BitmapGraphics.h"
 
-//#include <Fonts/FreeSansBold24pt7b.h>
 #include <Fonts/FreeSansBold9pt7b.h>
 #include <Fonts/FreeSansBold12pt7b.h>
 #include <Fonts/FreeSansBold18pt7b.h>
@@ -67,22 +66,7 @@ int playerServing = -1;
 void setup()
 {
     Serial.begin(115200);
-    display.init();
- 
-    display.drawExampleBitmap(gImage_splash, 0, 0, 200, 200, GxEPD_BLACK);
-    display.fillScreen(GxEPD_WHITE);
-    display.update();
-    
-    display.setRotation(90);
-
-    printGrid();
-    display.update();
-    setResultFont();
-
-    //display.drawExampleBitmap(gImage_gui_f, sizeof(gImage_gui_f), GxEPD::bm_default | GxEPD::bm_partial_update);
-
-    //display.drawExampleBitmap(gImage_gui_f, 0, 0, 200, 200, GxEPD_BLACK);
-    // display.drawExampleBitmap(gImage_gui_f, sizeof(gImage_gui_f), GxEPD::bm_default | GxEPD::bm_partial_update);
+    setupDisplay();
 
     pinMode(BUTTON1_PIN, INPUT_PULLDOWN);
     pinMode(BUTTON2_PIN, INPUT_PULLDOWN);
@@ -115,6 +99,24 @@ void loop()
 */
 }
 
+void setupDisplay() {
+    display.init();
+ 
+    display.drawExampleBitmap(gImage_splash, 0, 0, 200, 200, GxEPD_BLACK);
+    display.fillScreen(GxEPD_WHITE);
+    display.update();
+    
+    display.setRotation(90);
+
+    printGrid();
+    display.update();
+    setResultFont();
+
+    //display.drawExampleBitmap(gImage_gui_f, sizeof(gImage_gui_f), GxEPD::bm_default | GxEPD::bm_partial_update);
+
+    //display.drawExampleBitmap(gImage_gui_f, 0, 0, 200, 200, GxEPD_BLACK);
+    // display.drawExampleBitmap(gImage_gui_f, sizeof(gImage_gui_f), GxEPD::bm_default | GxEPD::bm_partial_update);
+}
 
 void setResultFont()
 {
