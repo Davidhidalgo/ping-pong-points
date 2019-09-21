@@ -66,6 +66,7 @@ int playerServing = -1;
 void setup()
 {
     Serial.begin(115200);
+    
     setupDisplay();
 
     pinMode(BUTTON1_PIN, INPUT_PULLDOWN);
@@ -79,24 +80,6 @@ void loop()
 {
     buttonPlayer1.check();
     buttonPlayer2.check();
-
-    // displayScore();
-    //printPlayer1();
-    //delay(500);
-    //printPlayer2();
-    //delay(2000);
-
- /*   
-    int buttonState = digitalRead(BUTTON1_PIN);
-    
-    if ( buttonState == HIGH ) { 
-        printPlayer1();
-        Serial.println("H");
-    } else {
-        Serial.println("L");
-    }
-    delay(200);
-*/
 }
 
 void setupDisplay() {
@@ -111,11 +94,6 @@ void setupDisplay() {
     printGrid();
     display.update();
     setResultFont();
-
-    //display.drawExampleBitmap(gImage_gui_f, sizeof(gImage_gui_f), GxEPD::bm_default | GxEPD::bm_partial_update);
-
-    //display.drawExampleBitmap(gImage_gui_f, 0, 0, 200, 200, GxEPD_BLACK);
-    // display.drawExampleBitmap(gImage_gui_f, sizeof(gImage_gui_f), GxEPD::bm_default | GxEPD::bm_partial_update);
 }
 
 void setResultFont()
@@ -220,13 +198,10 @@ void displayDashes()
 void handleEvent(AceButton * /* button */, uint8_t eventType,
                  uint8_t /* buttonState */)
 {
-    Serial.println("EV TYP");
-    Serial.println(eventType);
     switch (eventType)
     {
     case AceButton::kEventReleased:
         printPlayer1();
-        Serial.println("RELEASED");
        break;
     }
 }
