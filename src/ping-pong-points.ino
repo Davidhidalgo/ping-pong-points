@@ -162,13 +162,15 @@ void printPlayerScore(uint8_t player_id)
 
 void handleEvent(AceButton * button, uint8_t eventType, uint8_t buttonState)
 {
-    uint8_t id = button->getId(); 
+    uint8_t id = button->getId();
 
     switch (eventType) {
         case AceButton::kEventReleased:
-            if (!gameFinished()) {
-                addPlayerPoint(id);
+            if (gameFinished()) {
+                return;
             }
+            PLAYERS[id].score += 1;
+            printPlayerScore(id);
             break;
     }
 
@@ -177,19 +179,12 @@ void handleEvent(AceButton * button, uint8_t eventType, uint8_t buttonState)
 bool gameFinished() {
     Serial.println(PLAYERS[0].score);
     Serial.println(PLAYERS[1].score);
-    if (PLAYERS[0].score >= 5 && (PLAYERS[0].score - PLAYERS[1].score) >=2) {
+    if (PLAYERS[0].score >= 11 && (PLAYERS[0].score - PLAYERS[1].score) >=2) {
         Serial.println("Player 1 WINS");
         return true;
-    } else if (PLAYERS[1].score >= 5 && (PLAYERS[1].score - PLAYERS[0].score >=2)) {
+    } else if (PLAYERS[1].score >= 11 && (PLAYERS[1].score - PLAYERS[0].score >=2)) {
         Serial.println("Player 2 WINS");
         return true;
     };
     return false;
-}
-
-void addPlayerPoint(uint8_t id) {
-    PLAYERS[id].score += 1;
-    
-    printPlayerScore(id);
-
 }
