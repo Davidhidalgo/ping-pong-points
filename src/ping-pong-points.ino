@@ -47,30 +47,28 @@ GxEPD_Class display(io, 16, 4);
 
 using namespace ace_button;
 
-//const int BUTTON1_PIN = 15;
-//const int BUTTON2_PIN = 2;
-
 void handleEvent(AceButton *, uint8_t, uint8_t);
+
+const uint8_t NUM_PLAYERS = 2;
+
+const uint8_t BUTTON_PLAYER1_PIN = 15;
+const uint8_t BUTTON_PLAYER2_PIN = 2;
 
 char DASHES[2] = {'-', '-'};
 
 const int matchPoints = 9;
 bool matchStarted = false;
 
-int player1Score = 0;
-int player2Score = 0;
 int playerServing = -1;
-
-const uint8_t NUM_PLAYERS = 2;
 
 struct Player {
     const uint8_t buttonPin;
-    const uint8_t score;
+    uint8_t score;
 };
 
 Player PLAYERS[NUM_PLAYERS] = {
-    {15, 0},
-    {2, 0}
+    {BUTTON_PLAYER1_PIN, 0},
+    {BUTTON_PLAYER2_PIN, 0}
 };
 
 AceButton buttons[NUM_PLAYERS];
@@ -116,56 +114,43 @@ void setResultFont()
     display.setTextSize(2);
 }
 
-void printPlayer1()
+void printPlayerScore(uint8_t player_id)
 {
-    int box_x = 5;
-    int box_y = 5;
-    int box_w = 92;
-    int box_h = 90;
+    struct Box {
+        uint8_t x;
+        uint8_t y;
+        uint8_t w;
+        uint8_t h;
+        
+    };
+    Box Boxes[NUM_PLAYERS] {
+        {5, 5, 92, 90},
+        {103, 5, 92, 90},
+    };
+
+    Box box = Boxes[player_id];
+    Player player = PLAYERS[player_id];
 
     int xPosition = 7;
-    if (player1Score < 10)
+    if (player.score < 10)
     {
         xPosition = 25;
     }
 
-    display.fillRect(box_x, box_y, box_w, box_h, GxEPD_WHITE);
-    //display.drawRect(box_x, box_y, box_w, box_h, GxEPD_BLACK);
-    display.setCursor(box_x + xPosition, 72);
-    display.print(player1Score);
-    display.updateWindow(box_x, box_y, box_w, box_h, true);
+    display.fillRect(box.x, box.y, box.w, box.h, GxEPD_WHITE);
+    display.setCursor(box.x + xPosition, 72);
+    display.print(player.score);
+    display.updateWindow(box.x, box.y, box.w, box.h, true);
     
-    if (player1Score >= 11) {
-        //display.fillRect(box_x, box_y, box_w, box_h, GxEPD_WHITE);
-        //display.drawRect(box_x, box_y, box_w, box_h, GxEPD_BLACK);
+    if (player.score >= 11) {
         display.fillScreen(GxEPD_WHITE);
         display.update();
-        display.setCursor(box_x + xPosition, 72);
+        display.setCursor(box.x + xPosition, 72);
         display.setTextSize(0.25);       
         display.print("todo el rato trap");
         display.update();
 
        }
-}
-
-void printPlayer2()
-{
-    int box_x = 103;
-    int box_y = 5;
-    int box_w = 92;
-    int box_h = 90;
-
-    int xPosition = 7;
-    if (player2Score < 10)
-    {
-        xPosition = 25;
-    }
-
-    display.fillRect(box_x, box_y, box_w, box_h, GxEPD_WHITE);
-    //display.drawRect(box_x, box_y, box_w, box_h, GxEPD_BLACK);
-    display.setCursor(box_x + xPosition, 72);
-    display.print(player2Score);
-    display.updateWindow(box_x, box_y, box_w, box_h, true);
 }
 
 void printGrid()
@@ -175,6 +160,7 @@ void printGrid()
     display.fillRect(98, 0, 4, 100, GxEPD_BLACK);
 }
 
+/* 
 void toggleServe()
 {
     bool changeServe = (player1Score + player2Score) % 2 == 0;
@@ -190,13 +176,16 @@ void toggleServe()
         }
     }
 }
+*/
 
+/* 
 void resetMatch()
 {
     player1Score = 0;
     player2Score = 0;
     matchStarted = false;
 }
+*/
 
 void displayScore()
 {
@@ -226,13 +215,8 @@ void handleEvent(AceButton * button, uint8_t eventType, uint8_t buttonState)
     {
     case AceButton::kEventReleased:
         Serial.println(id);
-        if (id==0) {
-            player1Score += 1;
-            printPlayer1();
-        } else if (id==1) {
-            player2Score += 1;
-            printPlayer2();
-        }
+        PLAYERS[id].score += 1;
+        printPlayerScore(id);
         break;
     }
 }
