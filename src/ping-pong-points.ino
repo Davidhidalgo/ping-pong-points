@@ -59,11 +59,10 @@ char DASHES[2] = {'-', '-'};
 const int matchPoints = 9;
 bool matchStarted = false;
 
-int playerServing = -1;
-
 struct Player {
     const uint8_t buttonPin;
     uint8_t score;
+    bool serving;
 };
 
 Player PLAYERS[NUM_PLAYERS] = {
@@ -107,6 +106,14 @@ void setupDisplay() {
     setResultFont();
 }
 
+void printGrid()
+{
+    display.fillRect(0, 0, 200, 100, GxEPD_BLACK);
+    display.fillRect(4, 4, 192, 92, GxEPD_WHITE);
+    display.fillRect(98, 0, 4, 100, GxEPD_BLACK);
+}
+
+
 void setResultFont()
 {
     display.setFont(fontResult);
@@ -147,76 +154,42 @@ void printPlayerScore(uint8_t player_id)
         display.update();
         display.setCursor(box.x + xPosition, 72);
         display.setTextSize(0.25);       
-        display.print("todo el rato trap");
         display.update();
 
        }
 }
 
-void printGrid()
-{
-    display.fillRect(0, 0, 200, 100, GxEPD_BLACK);
-    display.fillRect(4, 4, 192, 92, GxEPD_WHITE);
-    display.fillRect(98, 0, 4, 100, GxEPD_BLACK);
-}
-
-/* 
-void toggleServe()
-{
-    bool changeServe = (player1Score + player2Score) % 2 == 0;
-    if (changeServe)
-    {
-        if (playerServing == 1)
-        {
-            playerServing = 0;
-        }
-        else
-        {
-            playerServing = 1;
-        }
-    }
-}
-*/
-
-/* 
-void resetMatch()
-{
-    player1Score = 0;
-    player2Score = 0;
-    matchStarted = false;
-}
-*/
-
-void displayScore()
-{
-    // String result = String(player1Score); // + String(player2Score);
-
-    // if (!matchStarted)
-    // {
-    //     displayDashes();
-    // }
-    // else
-    // {
-    //     sevseg.setNumber(result.toInt()); //, playerServing);
-    // }
-    // sevseg.refreshDisplay();
-}
-
-void displayDashes()
-{
-    // sevseg.setChars(DASHES);
-}
 
 void handleEvent(AceButton * button, uint8_t eventType, uint8_t buttonState)
 {
     uint8_t id = button->getId(); 
 
-    switch (eventType)
-    {
-    case AceButton::kEventReleased:
-        Serial.println(id);
-        PLAYERS[id].score += 1;
-        printPlayerScore(id);
-        break;
+    switch (eventType) {
+        case AceButton::kEventReleased:
+            if (!gameFinished()) {
+                addPlayerPoint(id);
+            }
+            break;
     }
+
+}
+
+bool gameFinished() {
+    Serial.println(PLAYERS[0].score);
+    Serial.println(PLAYERS[1].score);
+    if (PLAYERS[0].score >= 5 && (PLAYERS[0].score - PLAYERS[1].score) >=2) {
+        Serial.println("Player 1 WINS");
+        return true;
+    } else if (PLAYERS[1].score >= 5 && (PLAYERS[1].score - PLAYERS[0].score >=2)) {
+        Serial.println("Player 2 WINS");
+        return true;
+    };
+    return false;
+}
+
+void addPlayerPoint(uint8_t id) {
+    PLAYERS[id].score += 1;
+    
+    printPlayerScore(id);
+
 }
