@@ -49,14 +49,13 @@ using namespace ace_button;
 
 void handleEvent(AceButton *, uint8_t, uint8_t);
 
+
 const uint8_t NUM_PLAYERS = 2;
+const int MATCH_POINTS = 11;
 
 const uint8_t BUTTON_PLAYER1_PIN = 15;
 const uint8_t BUTTON_PLAYER2_PIN = 2;
 
-char DASHES[2] = {'-', '-'};
-
-const int matchPoints = 9;
 bool matchStarted = false;
 
 struct Player {
@@ -66,8 +65,8 @@ struct Player {
 };
 
 Player PLAYERS[NUM_PLAYERS] = {
-    {BUTTON_PLAYER1_PIN, 0},
-    {BUTTON_PLAYER2_PIN, 0}
+    {BUTTON_PLAYER1_PIN, 0, 0},
+    {BUTTON_PLAYER2_PIN, 0, 0}
 };
 
 AceButton buttons[NUM_PLAYERS];
@@ -104,6 +103,8 @@ void setupDisplay() {
     printGrid();
     display.update();
     setResultFont();
+
+    printPlayersScore();
 }
 
 void printGrid()
@@ -148,17 +149,13 @@ void printPlayerScore(uint8_t player_id)
     display.setCursor(box.x + xPosition, 72);
     display.print(player.score);
     display.updateWindow(box.x, box.y, box.w, box.h, true);
-    
-    if (player.score >= 11) {
-        display.fillScreen(GxEPD_WHITE);
-        display.update();
-        display.setCursor(box.x + xPosition, 72);
-        display.setTextSize(0.25);       
-        display.update();
-
-       }
 }
 
+void printPlayersScore() {
+    for (uint8_t i=0; i< NUM_PLAYERS; i++) {
+        printPlayerScore(i);
+    }
+}
 
 void handleEvent(AceButton * button, uint8_t eventType, uint8_t buttonState)
 {
@@ -167,22 +164,29 @@ void handleEvent(AceButton * button, uint8_t eventType, uint8_t buttonState)
     switch (eventType) {
         case AceButton::kEventReleased:
             if (gameFinished()) {
+                PLAYERS[0].score = 0;
+                PLAYERS[1].score = 0;
+                printPlayersScore();
+                matchStarted = false;
                 return;
+            } else {
+                matchStarted = true;
             }
-            PLAYERS[id].score += 1;
-            printPlayerScore(id);
+
+            if (matchStarted) {
+                PLAYERS[id].score += 1;
+                printPlayerScore(id);
+            }
             break;
     }
 
 }
 
 bool gameFinished() {
-    Serial.println(PLAYERS[0].score);
-    Serial.println(PLAYERS[1].score);
-    if (PLAYERS[0].score >= 11 && (PLAYERS[0].score - PLAYERS[1].score) >=2) {
+    if (PLAYERS[0].score >= MATCH_POINTS && (PLAYERS[0].score - PLAYERS[1].score) >=2) {
         Serial.println("Player 1 WINS");
         return true;
-    } else if (PLAYERS[1].score >= 11 && (PLAYERS[1].score - PLAYERS[0].score >=2)) {
+    } else if (PLAYERS[1].score >= MATCH_POINTS && (PLAYERS[1].score - PLAYERS[0].score >=2)) {
         Serial.println("Player 2 WINS");
         return true;
     };
